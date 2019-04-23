@@ -1,8 +1,10 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
+#ifndef TASK_FILE_RANDOMISER_H
+
+#define TASK_FILE_RANDOMISER_H
+
 #include "task_file_randomiser.h"
 
+#endif
 int main( int argc, char** argv )
 {
     if( argc == 1 )
@@ -21,10 +23,10 @@ int main( int argc, char** argv )
         }
     }
     else
-    {   
-        perror( "Error: Invalid number of parameters, please use this format to run program- ./task_file_randomiser <number-of-tasks>\n" );   
+    {
+        perror( "Error: Invalid number of parameters, please use this format to run program- ./task_file_randomiser <number-of-tasks>\n" );
     }
-    
+
     return 0;
 }
 
@@ -35,7 +37,7 @@ void taskFileCreate( int numTasks )
     int taskTime;
     int success;
 
-    srand( time( NULL ) );    
+    srand( time( NULL ) );
 
 
     fp = fopen( "task_file", "a" );
@@ -50,13 +52,13 @@ void taskFileCreate( int numTasks )
         {
 
             taskTime = rand() % 50;
-            success = fprintf( fp, "%d %d\n", ii, taskTime );  
-            if( success < 0 )   
+            success = fprintf( fp, "%d %d\n", ii, taskTime );
+            if( success < 0 )
             {
                 perror( "Error: Couldn't append to file\n" );
-            }           
+            }
         }
     }
-       
+
     fclose( fp );
-}   
+}

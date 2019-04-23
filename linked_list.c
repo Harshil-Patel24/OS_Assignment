@@ -1,7 +1,16 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-include "linked_list.h"
+#ifndef SCHEDULER_H
+#define SCHEDULER_H
+
+#include "scheduler.h"
+
+#endif
+
+#ifndef LINKED_LIST_H
+#define LINKED_LIST_H
+
+#include "linked_list.h"
+
+#endif
 
 #define MAXSIZE 500
 
@@ -9,14 +18,14 @@ include "linked_list.h"
  * METHOD: makeList
  * PURPOSE: To make a linked list, initilise values and return the list
  *          Used to make instanciating linked lists easier and reduces
- *          potential error (ie. forgetting to initialise head, tail etc. ) 
+ *          potential error (ie. forgetting to initialise head, tail etc. )
  **/
 LinkedList* makeList( int maxSize )
 {
     /* Declare the LinkedList */
     LinkedList* list = NULL;
- 
-    /* Allocates heap memory for the list */   
+
+    /* Allocates heap memory for the list */
     list = ( LinkedList* )malloc( sizeof( LinkedList ) );
 
     /* Initialises the values */
@@ -24,9 +33,9 @@ LinkedList* makeList( int maxSize )
     list->tail = NULL;
     list->size = 0;
 
-    /* Ensures mazsize is a positive number */    
+    /* Ensures mazsize is a positive number */
     if( maxSize > 0 )
-    {  
+    {
         list->max = maxSize;
     }
     /* Otherwise set the default of 10 and notify user */
@@ -45,33 +54,32 @@ LinkedList* makeList( int maxSize )
  * METHOD: insertLast
  * PURPOSE: To create a node from imported data and insert it at the end of imported list
  *          This saves me having to create a list node first and then add it at the end
- *          by manually chaging next and prev pointers 
+ *          by manually chaging next and prev pointers
  **/
-void insertLast( LinkedList* list, char* data )
+void insertLast( LinkedList* list, int taskID, int burstTime )
 {
     if( list->size < list->max )
-    { 
+    {
         /* Allocates heap memory for the node */
         LinkedListNode* newNd = ( LinkedListNode* )malloc( sizeof( LinkedListNode ) );
         /* Data will also be stored on heap */
-        newNd->data = ( char* )malloc( sizeof( char ) * MAXSIZE );
+/*        newNd->taskID = ( int* )malloc( sizeof( int ) ); */
 
         /* Initialises data within the list node */
         newNd->prev = NULL;
         newNd->next = NULL;
- 
-        /* Copies data into newNd */
-        strcpy( newNd->data, data );
 
+        newNd->taskID = taskID;
+        newNd->burstTime = burstTime;
 
         /* Inserts the node at the end of the list if there are already nodes in the list */
         if( list->head != NULL )
-        {  
+        {
             newNd->prev = list->tail;
-    
+
             list->tail = newNd;
-            newNd->prev->next = newNd;              
-           
+            newNd->prev->next = newNd;
+
             list->size++;
         }
         /* If there is no node, then make this new node the head */
@@ -79,7 +87,7 @@ void insertLast( LinkedList* list, char* data )
         {
             list->head = newNd;
             list->tail = newNd;
-        
+
             list->size++;
         }
     }
@@ -92,7 +100,7 @@ void insertLast( LinkedList* list, char* data )
 
 /**
  * METHOD: printList
- * PURPOSE: To print out the contents of the imported list 
+ * PURPOSE: To print out the contents of the imported list
  **/
 void printList( LinkedList* list )
 {
@@ -104,7 +112,7 @@ void printList( LinkedList* list )
     curr = list->head;
     for( ii = 0; ii < list->size; ii++ )
     {
-        printf( "%s\n", curr->data );
+        printf( "Task ID: %d\nBurst Time: %d\n", curr->taskID, curr->burstTime );
         curr = curr->next;
     }
 }
@@ -112,7 +120,7 @@ void printList( LinkedList* list )
 /**
  * METHOD: freeList
  * PURPOSE: To free all of the nodes in the imported list and finally the list itself
- **/  
+ **/
 void freeList( LinkedList* list )
 {
     /* Initialise variables */
@@ -129,20 +137,13 @@ void freeList( LinkedList* list )
             temp = curr;
             curr = curr->prev;
 
-            /* Free's the data inside the node first */
-            if( temp->data != NULL )
-            {
-                free( temp->data );
-                temp->data = NULL;
-            }
-     
             /* Free's the node */
-            free( temp );   
+            free( temp );
             temp = NULL;
         }
         /* Finally free's the entire list */
         free( list );
-        list = NULL;                 
+        list = NULL;
     }
     else
     {
@@ -174,17 +175,10 @@ void removeLast( LinkedList* list )
     /* Stops it from pointing anywhere important */
     last->next = NULL;
     last->prev = NULL;
-    
-    /* Free the data within the end node */
-    if( last->data != NULL )
-    {
-        free( last->data );
-        last->data = NULL;
-    }
 
     /* Free the last node */
     free( last );
-    last = NULL; 
+    last = NULL;
 }
 
 /**
@@ -204,20 +198,13 @@ void removeFirst( LinkedList* list )
     list->head = second;
 
     /* Decrement size of linked list */
-    list->size--; 
+    list->size--;
 
     /* Stops it from pointing anywhere important */
     first->next = NULL;
     first->prev = NULL;
-    
-    /* Free the data within the first node */
-    if( first->data != NULL )
-    {
-        free( first->data );
-        first->data = NULL;
-    }
 
     /* Free the first node */
     free( first );
-    first = NULL; 
+    first = NULL;
 }
