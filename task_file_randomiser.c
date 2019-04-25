@@ -1,7 +1,3 @@
-#ifndef TASK_FILE_RANDOMISER_H
-
-#define TASK_FILE_RANDOMISER_H
-
 #include "task_file_randomiser.h"
 
 #endif

@@ -1,6 +1,10 @@
+#ifndef LINKED_LIST_H
+#define LINKED_LIST_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "scheduler.h"
 
 /* This is a specific linked list for this program */
 typedef struct LinkedListNode
@@ -27,3 +31,5 @@ void insertLast( LinkedList*, char* );
 void printList( LinkedList* );
 void freeList( LinkedList* );
 void removeLast( LinkedList* );
+
+#endif

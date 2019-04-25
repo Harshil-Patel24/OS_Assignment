@@ -12,11 +12,11 @@
 #endif
 
 #define MAXSIZE 500
-
+ 
 /**
  * METHOD: readFile
  * PURPOSE: Reads the file and scans each entry into a linked list
- *          specifically designed for this purpose. 
+ *          specifically designed for this purpose.
  *          This method will also perform error checking for file formatting
  **/
 void readFile( char* fName, LinkedList* list, LinkedList* errors )
@@ -29,11 +29,11 @@ void readFile( char* fName, LinkedList* list, LinkedList* errors )
 
     f = fopen( fName, "r" );
 
-    /* Checks if the file opening was successful*/    
+    /* Checks if the file opening was successful*/
     if( f == NULL )
     {
         sprintf( errMsg, "File could not be opened" );
-        insertLast( errors, errMsg );       
+        insertLast( errors, errMsg );
     }
     else
     {
@@ -63,14 +63,14 @@ void readFile( char* fName, LinkedList* list, LinkedList* errors )
     /* Only closes file if it was opened */
     if( f != NULL )
     {
-        fflush( f ); 
+        fflush( f );
         fclose( f );
     }
 }
 
-/** 
+/**
  * METHOD: numWords
- * PURPOSE: To calculate the number of word in a string, 
+ * PURPOSE: To calculate the number of word in a string,
  *          used to validate the number of words in the file
  **/
 int numWords( char* str )
@@ -97,12 +97,12 @@ int numWords( char* str )
     return wordCount;
 }
 
-/** 
+/**
  * METHOD: writeLog
- * PURPOSE: To print imported string into the imported file, 
+ * PURPOSE: To print imported string into the imported file,
  * for our purposes that will be to the logfile
  **/
 void writeLog( FILE* logFile, char* logStr )
-{  
+{
     fprintf( logFile, "%s", logStr );
 }

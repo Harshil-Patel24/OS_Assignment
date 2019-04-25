@@ -1,16 +1,4 @@
-#ifndef SCHEDULER_H
-#define SCHEDULER_H
-
-#include "scheduler.h"
-
-#endif
-
-#ifndef LINKED_LIST_H
-#define LINKED_LIST_H
-
 #include "linked_list.h"
-
-#endif
 
 #define MAXSIZE 500
 
