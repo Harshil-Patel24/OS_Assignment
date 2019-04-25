@@ -1,5 +1,6 @@
 #include "task_file_randomiser.h"
 
+#endif
 int main( int argc, char** argv )
 {
     if( argc == 1 )

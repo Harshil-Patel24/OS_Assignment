@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "scheduler.h"
 
 /* This is a specific linked list for this program */
 typedef struct LinkedListNode
@@ -21,13 +20,13 @@ typedef struct
     int size;
     int max;
     LinkedListNode* head;
-    LinkedListNode* tail
+    LinkedListNode* tail;
 }
 LinkedList;
 
 /* Method declarations */
-LinkedList* makeList( void );
-void insertLast( LinkedList*, char* );
+LinkedList* makeList( int );
+void insertLast( LinkedList*, int, int );
 void printList( LinkedList* );
 void freeList( LinkedList* );
 void removeLast( LinkedList* );

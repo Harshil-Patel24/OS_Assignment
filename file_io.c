@@ -1,19 +1,19 @@
 #include "file_io.h"
+#define BUFFER 50
 
-int numLines( char* fileName )
+int getNumLines( char* fileName )
 {
     FILE* fp;
     int numLines;
     char c;
 
-    c = '';
-    fp = fopen( fileName );
+    fp = fopen( fileName, "r" );
 
     if( fp != NULL )
     {
         numLines = 0;
 
-        while( !eof( c ) )
+        while( c != EOF )
         {
             c = fgetc( fp );
 
@@ -22,11 +22,32 @@ int numLines( char* fileName )
                 numLines++;
             }
         }
+        fclose( fp );
     }
     else
     {
         perror( "Error: Couldn't read from file\n" );
     }
-
     return numLines;
+}
+
+void fileToLL( LinkedList* ll, char* fileName )
+{
+    FILE* fp;
+    char* fileString;
+    int taskNo, burstTime;
+
+    fp = fopen( fileName, "r" );
+
+    if( fp != NULL )
+    {
+        fgets( fileString, BUFFER, fp );
+        scanf( fileString, "%d %d", &taskNo, &burstTime );
+
+        insertLast( ll, taskNo, burstTime );
+    }
+    else
+    {
+        perror( "Error: File format is wrong\n" );
+    }
 }

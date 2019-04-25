@@ -14,7 +14,7 @@ int main( int argc, char** argv )
         /* Third argument should be maximum queue sized required */
         if( atoi( argv[2] ) > 0 )
         {
-            maxSize = atoi( argv[3] )
+            maxSize = atoi( argv[3] );
             readyQ = makeList( maxSize );
             schedule( readyQ, argv[2] );
         }
@@ -38,6 +38,9 @@ void schedule( LinkedList* readyQ, char* taskFileName )
 
     numLines = getNumLines( taskFileName );
     tasks = makeList( numLines );
+
+
+
 }
 
 void cpu( void )

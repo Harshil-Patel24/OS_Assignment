@@ -5,7 +5,7 @@
 #include "linked_list.h"
 #include "file_io.h"
 
-void schedule( LinkedList*, char* )
+void schedule( LinkedList*, char* );
 void cpu( void );
 void task( LinkedList* );
 
