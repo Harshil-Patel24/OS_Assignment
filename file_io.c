@@ -3,9 +3,9 @@
 
 int getNumLines( char* fileName )
 {
-    FILE* fp;
-    int numLines;
-    char c;
+    FILE* fp = NULL;
+    int numLines = 0;
+    char c = 0;
 
     fp = fopen( fileName, "r" );
 
@@ -28,26 +28,30 @@ int getNumLines( char* fileName )
     {
         perror( "Error: Couldn't read from file\n" );
     }
+printf( "Number of lines (getNumLines()): %d\n", numLines );
     return numLines;
 }
 
 void fileToLL( LinkedList* ll, char* fileName )
 {
-    FILE* fp;
-    char* fileString = NULL;
-    int taskNo, burstTime;
+    FILE* fp = NULL;
+    char fileString[50];
+    int taskNo = 0;
+    int burstTime = 0;
 
     fp = fopen( fileName, "r" );
 
     if( fp != NULL )
     {
-        fgets( fileString, BUFFER, fp );
-        scanf( fileString, "%d %d", &taskNo, &burstTime );
-
-        insertLast( ll, taskNo, burstTime );
+        while( fgets( fileString, BUFFER, fp ) != NULL )
+        {
+            sscanf( fileString, "%d %d", &taskNo, &burstTime );
+            insertLast( ll, taskNo, burstTime );
+        }
+        fclose( fp );
     }
     else
     {
-        perror( "Error: File format is wrong\n" );
+        perror( "Error: File could not be opened\n" );
     }
 }

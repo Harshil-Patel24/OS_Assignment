@@ -196,3 +196,28 @@ void removeFirst( LinkedList* list )
     free( first );
     first = NULL;
 }
+
+/* Will return 1 if full, 0 if not full */
+int isFull( LinkedList* ll )
+{
+    int full = 1;
+
+    if( ll->size < ll->max )
+    {
+        full = 0;
+    }
+
+    return full;
+}
+
+int isEmpty( LinkedList* ll )
+{
+    int empty = 1;
+
+    if( ll->size > 0 )
+    {
+        empty = 0;
+    }
+
+    return empty;
+}

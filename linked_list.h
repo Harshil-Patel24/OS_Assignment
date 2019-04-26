@@ -30,5 +30,8 @@ void insertLast( LinkedList*, int, int );
 void printList( LinkedList* );
 void freeList( LinkedList* );
 void removeLast( LinkedList* );
+void removeFirst( LinkedList* );
+int isFull( LinkedList* );
+int isEmpty( LinkedList* );
 
 #endif

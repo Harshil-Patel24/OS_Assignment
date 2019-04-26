@@ -6,5 +6,6 @@
 #include  "linked_list.h"
 
 int getNumLines( char* );
+void fileToLL( LinkedList*, char* );
 
 #endif

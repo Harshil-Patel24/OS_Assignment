@@ -12,7 +12,7 @@ $(EXEC_TASK_FILE): clean $(OBJ_TASK_FILE)
 	$(CC) $(OBJ_TASK_FILE) -o $(EXEC_TASK_FILE)
 
 $(EXEC): clean $(OBJ)
-	$(CC) $(OBJ_TASK_FILE) -o $(EXEC)
+	$(CC) $(OBJ) -o $(EXEC)
 
 task_file_randomiser.o: task_file_randomiser.c task_file_randomiser.h
 	$(CC) -c task_file_randomiser.c $(CFLAGS)
@@ -27,4 +27,4 @@ scheduler.o: scheduler.c scheduler.h file_io.h linked_list.h
 	$(CC) -c scheduler.c $(CFLAGS)
 
 clean:
-	rm -f $(OBJ_TASK_FILE) $(EXEC) task_file
+	rm -f $(OBJ) $(OBJ_TASK_FILE) $(EXEC) $(EXEC_TASK_FILE) task_file
