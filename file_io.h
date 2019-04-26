@@ -7,5 +7,6 @@
 
 int getNumLines( char* );
 void fileToLL( LinkedList*, char* );
+void writeLog( FILE*, char* );
 
 #endif

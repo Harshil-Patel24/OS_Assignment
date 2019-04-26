@@ -55,3 +55,14 @@ void fileToLL( LinkedList* ll, char* fileName )
         perror( "Error: File could not be opened\n" );
     }
 }
+
+/**
+ * METHOD: writeLog
+ * PURPOSE: To print imported string into the imported file,
+ * for our purposes that will be to the logfile
+ * REFERENCE: Taken from my (Harshil Patel- 19460606) UCP assignment
+ **/
+void writeLog( FILE* logFile, char* logStr )
+{
+    fprintf( logFile, "%s", logStr );
+}
