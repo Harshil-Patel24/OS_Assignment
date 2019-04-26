@@ -14,9 +14,9 @@ int main( int argc, char** argv )
         /* Third argument should be maximum queue sized required */
         if( atoi( argv[2] ) > 0 )
         {
-            maxSize = atoi( argv[3] );
+            maxSize = atoi( argv[2] );
             readyQ = makeList( maxSize );
-            schedule( readyQ, argv[2] );
+            schedule( readyQ, argv[1] );
         }
         else
         {

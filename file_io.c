@@ -34,7 +34,7 @@ int getNumLines( char* fileName )
 void fileToLL( LinkedList* ll, char* fileName )
 {
     FILE* fp;
-    char* fileString;
+    char* fileString = NULL;
     int taskNo, burstTime;
 
     fp = fopen( fileName, "r" );
