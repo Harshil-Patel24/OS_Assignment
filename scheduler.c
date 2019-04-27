@@ -3,6 +3,8 @@
 LinkedList* readyQ;
 LinkedList* tasks;
 
+pthread_mutex_t lock;
+
 /* scheduler.h will run the program and track most of its flow
  * it will have cpu() and task() methods */
 int main( int argc, char** argv )
@@ -14,13 +16,21 @@ int main( int argc, char** argv )
         int maxSize = 0;
         char* fileName = NULL;
 
+
         /* Third argument should be maximum queue sized required */
         if( atoi( argv[2] ) > 0 )
         {
-            maxSize = atoi( argv[2] );
-            readyQ = makeList( maxSize );
-            fileName = argv[1];
-            schedule( fileName );
+            if( pthread_mutex_init( &lock, NULL ) == 0 )
+            {
+                maxSize = atoi( argv[2] );
+                readyQ = makeList( maxSize );
+                fileName = argv[1];
+                schedule( fileName );
+            }
+            else
+            {
+                perror( "Error: Mutex initialisation failed\n");
+            }
         }
         else
         {
@@ -52,16 +62,18 @@ void schedule( char* taskFileName )
 
         fileToLL( tasks, taskFileName );
 
-
         /* Fill ready queue */
-        while( !isFull( readyQ ) )
+/*        while( !isFull( readyQ ) )
         {
             task( logFile );
         }
-
+*/
         pthread_create( &cpuThread, NULL, cpu, NULL );
+        pthread_create( &taskThread, NULL, task, NULL );
 
+        pthread_join( taskThread, NULL );
         pthread_join( cpuThread, NULL );
+
 /*
         THIS IS THE NON THREAD IMPLEMENTATION
         while( !isEmpty( readyQ ) )
@@ -87,9 +99,12 @@ void schedule( char* taskFileName )
 void* cpu( void* nothingLMAO )
 {
     int taskID, burstTime;
-
+printf("CPU\n");
     while( !isEmpty( readyQ ) )
     {
+printf("CPU\n");
+    /*    pthread_mutex_lock( &lock ); */
+
         taskID = readyQ->head->task.taskID;
         burstTime = readyQ->head->task.burstTime;
 
@@ -97,6 +112,8 @@ void* cpu( void* nothingLMAO )
         printf( "Task ID: %d\nBurst Time: %d\n", taskID, burstTime );
 
         removeFirst( readyQ );
+
+    /*    pthread_mutex_unlock( &lock ); */
     }
 
     return NULL;
@@ -114,25 +131,40 @@ void* task( void* logFile )
 
     logFile = ( FILE* )logFile;
 
-    for( ii = 0; ii < 2; ii++ )
+
+    while( !isEmpty( tasks ) )
     {
-        if( !isFull( readyQ ) )
+/* printf( "Task\n" ); */
+        /* pthread_mutex_lock( &lock ); */
+        if( readyQ->size <= readyQ->max - 2 )
         {
-            if( !isEmpty( tasks ) )
+/* printf( "size <= max\n" ); */
+            for( ii = 0; ii < 2; ii++ )
             {
-                time( &timer );
-                tmInfo = localtime( &timer );
+                if( !isFull( readyQ ) )
+                {
+/* printf( "ready queue is not full\n" ); */
+                    if( !isEmpty( tasks ) )
+                    {
+/* printf( "tasks queue is not empty\n" ); */
+                        time( &timer );
+                        tmInfo = localtime( &timer );
 
-                strftime( currTime, 50, "%H:%M:%S", tmInfo );
+                        strftime( currTime, 50, "%H:%M:%S", tmInfo );
 
-                taskID = tasks->head->task.taskID;
-                burstTime = tasks->head->task.burstTime;
-                insertLast( readyQ, taskID, burstTime );
-                sprintf( logStr, "================================\n%d: %d\nArrival Time: %s\n", taskID, burstTime, currTime );
-                writeLog( logFile, logStr );
-                removeFirst( tasks );
+                        taskID = tasks->head->task.taskID;
+                        burstTime = tasks->head->task.burstTime;
+                        insertLast( readyQ, taskID, burstTime );
+                        sprintf( logStr, "================================\n%d: %d\nArrival Time: %s\n", taskID, burstTime, currTime );
+                        /* writeLog( logFile, logStr ); */
+                        removeFirst( tasks );
+                    }
+                }
             }
         }
+        /* pthread_mutex_unlock( &lock ); */
     }
+
+
     return NULL;
 }
