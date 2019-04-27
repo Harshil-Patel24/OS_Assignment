@@ -1,5 +1,8 @@
 #include "scheduler.h"
 
+LinkedList* readyQ;
+LinkedList* tasks;
+
 /* scheduler.h will run the program and track most of its flow
  * it will have cpu() and task() methods */
 int main( int argc, char** argv )
@@ -9,7 +12,6 @@ int main( int argc, char** argv )
     {
         /* Variable declarations */
         int maxSize = 0;
-        LinkedList* readyQ = NULL;
         char* fileName = NULL;
 
         /* Third argument should be maximum queue sized required */
@@ -18,7 +20,7 @@ int main( int argc, char** argv )
             maxSize = atoi( argv[2] );
             readyQ = makeList( maxSize );
             fileName = argv[1];
-            schedule( readyQ, fileName );
+            schedule( fileName );
         }
         else
         {
@@ -33,9 +35,8 @@ int main( int argc, char** argv )
     return 0;
 }
 
-void schedule( LinkedList* readyQ, char* taskFileName )
+void schedule( char* taskFileName )
 {
-    LinkedList* tasks = NULL;
     int numLines = 0;
     FILE* logFile = fopen( "simulation_log", "w" );
 
@@ -55,7 +56,7 @@ void schedule( LinkedList* readyQ, char* taskFileName )
         /* Fill ready queue */
         while( !isFull( readyQ ) )
         {
-            task( tasks, readyQ, logFile );
+            task( logFile );
         }
 
         /* printList( readyQ ); */
@@ -68,7 +69,7 @@ void schedule( LinkedList* readyQ, char* taskFileName )
             if( readyQ->size <= readyQ->max - 2 )
             {
                 /* printf( "More added\n" ); */
-                task( tasks, readyQ, logFile );
+                task( logFile );
             }
         }
         fclose( logFile );
@@ -80,14 +81,12 @@ void schedule( LinkedList* readyQ, char* taskFileName )
 
 }
 
-void* cpu( void* inTaskInfo )
+void* cpu( void* nothingLMAO )
 {
     int taskID, burstTime;
 
-    Task* taskInfo = ( Task* )inTaskInfo;
-
-    taskID = taskInfo->taskID;
-    burstTime = taskInfo->burstTime;
+    taskID = readyQ->head->task.taskID;
+    burstTime = readyQ->head->task.burstTime;
 
     sleep( burstTime * 0.01 );
     printf( "Task ID: %d\nBurst Time: %d\n", taskID, burstTime );
@@ -96,7 +95,7 @@ void* cpu( void* inTaskInfo )
 }
 
 /* Used code from https://stackoverflow.com/questions/3673226/how-to-print-time-in-format-2009-08-10-181754-811 to format time */
-void task( LinkedList* tasks, LinkedList* readyQ, FILE* logFile )
+void task( FILE* logFile )
 {
     int ii;
     char logStr[50];

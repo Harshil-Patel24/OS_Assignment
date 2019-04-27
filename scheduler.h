@@ -8,8 +8,8 @@
 #include "file_io.h"
 #include "linked_list.h"
 
-void schedule( LinkedList*, char* );
+void schedule( char* );
 void* cpu( void* );
-void task( LinkedList*, LinkedList*, FILE* );
+void task( FILE* );
 
 #endif
