@@ -10,6 +10,6 @@
 
 void schedule( char* );
 void* cpu( void* );
-void task( FILE* );
+void* task( void* );
 
 #endif

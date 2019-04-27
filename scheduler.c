@@ -38,11 +38,12 @@ int main( int argc, char** argv )
 void schedule( char* taskFileName )
 {
     int numLines = 0;
+    /* THIS WILL PROBABLY HAVE TO CHANGE
+     * MAKE THIS OPEN AND APPEND INSTEAD */
     FILE* logFile = fopen( "simulation_log", "w" );
 
-/*    pthread_t cpuThread; */
-/*    pthread_create( cpuThread, NULL, cpu, &( readyQ->head->task ) ); */
-
+    pthread_t cpuThread;
+    pthread_t taskThread;
 
     if( logFile != NULL )
     {
@@ -51,7 +52,6 @@ void schedule( char* taskFileName )
 
         fileToLL( tasks, taskFileName );
 
-        /* printList( tasks ); */
 
         /* Fill ready queue */
         while( !isFull( readyQ ) )
@@ -59,8 +59,11 @@ void schedule( char* taskFileName )
             task( logFile );
         }
 
-        /* printList( readyQ ); */
+        pthread_create( &cpuThread, NULL, cpu, NULL );
 
+        pthread_join( cpuThread, NULL );
+/*
+        THIS IS THE NON THREAD IMPLEMENTATION
         while( !isEmpty( readyQ ) )
         {
             cpu( &( readyQ->head->task ) );
@@ -68,11 +71,11 @@ void schedule( char* taskFileName )
 
             if( readyQ->size <= readyQ->max - 2 )
             {
-                /* printf( "More added\n" ); */
                 task( logFile );
             }
         }
         fclose( logFile );
+*/
     }
     else
     {
@@ -85,17 +88,22 @@ void* cpu( void* nothingLMAO )
 {
     int taskID, burstTime;
 
-    taskID = readyQ->head->task.taskID;
-    burstTime = readyQ->head->task.burstTime;
+    while( !isEmpty( readyQ ) )
+    {
+        taskID = readyQ->head->task.taskID;
+        burstTime = readyQ->head->task.burstTime;
 
-    sleep( burstTime * 0.01 );
-    printf( "Task ID: %d\nBurst Time: %d\n", taskID, burstTime );
+        sleep( burstTime * 0.01 );
+        printf( "Task ID: %d\nBurst Time: %d\n", taskID, burstTime );
+
+        removeFirst( readyQ );
+    }
 
     return NULL;
 }
 
 /* Used code from https://stackoverflow.com/questions/3673226/how-to-print-time-in-format-2009-08-10-181754-811 to format time */
-void task( FILE* logFile )
+void* task( void* logFile )
 {
     int ii;
     char logStr[50];
@@ -103,6 +111,8 @@ void task( FILE* logFile )
     time_t timer;
     char currTime[50];
     struct tm* tmInfo;
+
+    logFile = ( FILE* )logFile;
 
     for( ii = 0; ii < 2; ii++ )
     {
@@ -124,4 +134,5 @@ void task( FILE* logFile )
             }
         }
     }
+    return NULL;
 }
