@@ -39,6 +39,10 @@ void schedule( LinkedList* readyQ, char* taskFileName )
     int numLines = 0;
     FILE* logFile = fopen( "simulation_log", "w" );
 
+/*    pthread_t cpuThread; */
+/*    pthread_create( cpuThread, NULL, cpu, &( readyQ->head->task ) ); */
+
+
     if( logFile != NULL )
     {
         numLines = getNumLines( taskFileName );
@@ -58,7 +62,7 @@ void schedule( LinkedList* readyQ, char* taskFileName )
 
         while( !isEmpty( readyQ ) )
         {
-            cpu( readyQ->head->taskID, readyQ->head->burstTime, logFile );
+            cpu( &( readyQ->head->task ) );
             removeFirst( readyQ );
 
             if( readyQ->size <= readyQ->max - 2 )
@@ -76,10 +80,19 @@ void schedule( LinkedList* readyQ, char* taskFileName )
 
 }
 
-void cpu( int taskID, int burstTime, FILE* logFile )
+void* cpu( void* inTaskInfo )
 {
+    int taskID, burstTime;
+
+    Task* taskInfo = ( Task* )inTaskInfo;
+
+    taskID = taskInfo->taskID;
+    burstTime = taskInfo->burstTime;
+
     sleep( burstTime * 0.01 );
     printf( "Task ID: %d\nBurst Time: %d\n", taskID, burstTime );
+
+    return NULL;
 }
 
 /* Used code from https://stackoverflow.com/questions/3673226/how-to-print-time-in-format-2009-08-10-181754-811 to format time */
@@ -92,7 +105,6 @@ void task( LinkedList* tasks, LinkedList* readyQ, FILE* logFile )
     char currTime[50];
     struct tm* tmInfo;
 
-
     for( ii = 0; ii < 2; ii++ )
     {
         if( !isFull( readyQ ) )
@@ -104,8 +116,8 @@ void task( LinkedList* tasks, LinkedList* readyQ, FILE* logFile )
 
                 strftime( currTime, 50, "%H:%M:%S", tmInfo );
 
-                taskID = tasks->head->taskID;
-                burstTime = tasks->head->burstTime;
+                taskID = tasks->head->task.taskID;
+                burstTime = tasks->head->task.burstTime;
                 insertLast( readyQ, taskID, burstTime );
                 sprintf( logStr, "================================\n%d: %d\nArrival Time: %s\n", taskID, burstTime, currTime );
                 writeLog( logFile, logStr );

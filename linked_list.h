@@ -5,11 +5,17 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* This is a specific linked list for this program */
-typedef struct LinkedListNode
+typedef struct
 {
     int taskID;
     int burstTime;
+}
+Task;
+
+/* This is a specific linked list for this program */
+typedef struct LinkedListNode
+{
+    Task task;
     struct LinkedListNode* next;
     struct LinkedListNode* prev;
 }

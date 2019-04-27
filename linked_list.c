@@ -51,14 +51,14 @@ void insertLast( LinkedList* list, int taskID, int burstTime )
         /* Allocates heap memory for the node */
         LinkedListNode* newNd = ( LinkedListNode* )malloc( sizeof( LinkedListNode ) );
         /* Data will also be stored on heap */
-/*        newNd->taskID = ( int* )malloc( sizeof( int ) ); */
+/*        newNd.taskID = ( int* )malloc( sizeof( int ) ); */
 
         /* Initialises data within the list node */
         newNd->prev = NULL;
         newNd->next = NULL;
 
-        newNd->taskID = taskID;
-        newNd->burstTime = burstTime;
+        newNd->task.taskID = taskID;
+        newNd->task.burstTime = burstTime;
 
         /* Inserts the node at the end of the list if there are already nodes in the list */
         if( list->head != NULL )
@@ -100,7 +100,7 @@ void printList( LinkedList* list )
     curr = list->head;
     for( ii = 0; ii < list->size; ii++ )
     {
-        printf( "Task ID: %d\nBurst Time: %d\n", curr->taskID, curr->burstTime );
+        printf( "Task ID: %d\nBurst Time: %d\n", curr->task.taskID, curr->task.burstTime );
         curr = curr->next;
     }
 }
