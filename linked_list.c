@@ -44,7 +44,7 @@ LinkedList* makeList( int maxSize )
  *          This saves me having to create a list node first and then add it at the end
  *          by manually chaging next and prev pointers
  **/
-void insertLast( LinkedList* list, int taskID, int burstTime )
+void insertLast( LinkedList* list, int taskID, int burstTime, int hr, int min, int sec )
 {
     if( list->size < list->max )
     {
@@ -59,6 +59,9 @@ void insertLast( LinkedList* list, int taskID, int burstTime )
 
         newNd->task.taskID = taskID;
         newNd->task.burstTime = burstTime;
+        newNd->task.arrivalTime.hour = hr;
+        newNd->task.arrivalTime.minute = min;
+        newNd->task.arrivalTime.second = sec;
 
         /* Inserts the node at the end of the list if there are already nodes in the list */
         if( list->head != NULL )

@@ -2,6 +2,9 @@
 
 LinkedList* readyQ;
 LinkedList* tasks;
+int numTasks;
+int totalWaitingTime;
+int totalTurnAroundTime;
 
 pthread_mutex_t lock;
 
@@ -12,10 +15,12 @@ int main( int argc, char** argv )
     /* Checks if correct number of arguments */
     if( argc == 3 )
     {
-        /* Variable declarations */
+        /* Variable declarations/initialisations */
         int maxSize = 0;
         char* fileName = NULL;
-
+        numTasks = 0;
+        totalWaitingTime = 0;
+        totalTurnAroundTime = 0;
 
         /* Third argument should be maximum queue sized required */
         if( atoi( argv[2] ) > 0 )
@@ -48,6 +53,7 @@ int main( int argc, char** argv )
 void schedule( char* taskFileName )
 {
     int numLines = 0;
+    char* cpu1 = "CPU-1";
     /* THIS WILL PROBABLY HAVE TO CHANGE
      * MAKE THIS OPEN AND APPEND INSTEAD */
     FILE* logFile = fopen( "simulation_log", "w" );
@@ -68,7 +74,7 @@ void schedule( char* taskFileName )
             task( logFile );
         }
 */
-        pthread_create( &cpuThread, NULL, cpu, NULL );
+        pthread_create( &cpuThread, NULL, cpu, cpu1 );
         pthread_create( &taskThread, NULL, task, NULL );
 
         pthread_join( taskThread, NULL );
@@ -96,24 +102,40 @@ void schedule( char* taskFileName )
 
 }
 
-void* cpu( void* nothingLMAO )
+void* cpu( void* cpuNum )
 {
     int taskID, burstTime;
-printf("CPU\n");
+    cpuNum = ( char* )cpuNum;
+
+    int hr, min, sec;
+    time_t timer;
+    char servTime[50];
+    struct tm* serviceTime;
+
     while( !isEmpty( readyQ ) )
     {
-printf("CPU\n");
-    /*    pthread_mutex_lock( &lock ); */
+/* printf("CPU\n"); */
+        pthread_mutex_lock( &lock );
 
         taskID = readyQ->head->task.taskID;
         burstTime = readyQ->head->task.burstTime;
+        hr = readyQ->head->task.arrivalTime.hour;
+        min = readyQ->head->task.arrivalTime.minute;
+        sec = readyQ->head->task.arrivalTime.second;
+
+
+        time( &timer );
+        serviceTime = localtime( &timer );
+
+        strftime( servTime, 50, "%H:%M:%S", serviceTime );
 
         sleep( burstTime * 0.01 );
-        printf( "Task ID: %d\nBurst Time: %d\n", taskID, burstTime );
+        printf( "Statistics for %s:\nTask: %d\nArrivalTime: %02d:%02d:%02d\nService Time: %s\n", taskID, hr, min, sec, servTime );
 
         removeFirst( readyQ );
-
-    /*    pthread_mutex_unlock( &lock ); */
+        numTasks--;
+        pthread_mutex_unlock( &lock );
+printf("CPU numTasks: %d", numTasks );
     }
 
     return NULL;
@@ -124,7 +146,8 @@ void* task( void* logFile )
 {
     int ii;
     char logStr[50];
-    int taskID, burstTime;
+    
+    int taskID, burstTime, hr, min, sec;
     time_t timer;
     char currTime[50];
     struct tm* tmInfo;
@@ -134,35 +157,40 @@ void* task( void* logFile )
 
     while( !isEmpty( tasks ) )
     {
-/* printf( "Task\n" ); */
-        /* pthread_mutex_lock( &lock ); */
+        pthread_mutex_lock( &lock );
         if( readyQ->size <= readyQ->max - 2 )
         {
-/* printf( "size <= max\n" ); */
             for( ii = 0; ii < 2; ii++ )
             {
                 if( !isFull( readyQ ) )
                 {
-/* printf( "ready queue is not full\n" ); */
                     if( !isEmpty( tasks ) )
                     {
-/* printf( "tasks queue is not empty\n" ); */
                         time( &timer );
                         tmInfo = localtime( &timer );
 
-                        strftime( currTime, 50, "%H:%M:%S", tmInfo );
+                        hr = tmInfo->tm_hour;
+                        min = tmInfo->tm_min;
+                        sec = tmInfo->tm_sec;
 
                         taskID = tasks->head->task.taskID;
                         burstTime = tasks->head->task.burstTime;
-                        insertLast( readyQ, taskID, burstTime );
+
+                        insertLast( readyQ, taskID, burstTime, hr, min, sec );
+
+/*                        strftime( currTime, 50, "%H:%M:%S", tmInfo );
+*/
                         sprintf( logStr, "================================\n%d: %d\nArrival Time: %s\n", taskID, burstTime, currTime );
+                        numTasks++;
                         /* writeLog( logFile, logStr ); */
                         removeFirst( tasks );
+printf("Task numTasks: %d", numTasks );
+
                     }
                 }
             }
         }
-        /* pthread_mutex_unlock( &lock ); */
+        pthread_mutex_unlock( &lock );
     }
 
 

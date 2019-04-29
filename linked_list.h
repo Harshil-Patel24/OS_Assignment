@@ -1,14 +1,24 @@
 #ifndef LINKED_LIST_H
 #define LINKED_LIST_H
 
+#include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 typedef struct
 {
+    int hour;
+    int minute;
+    int second;
+}
+Time;
+
+typedef struct
+{
     int taskID;
     int burstTime;
+    Time arrivalTime;
 }
 Task;
 
