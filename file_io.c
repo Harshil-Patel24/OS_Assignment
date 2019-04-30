@@ -46,7 +46,7 @@ void fileToLL( LinkedList* ll, char* fileName )
         while( fgets( fileString, BUFFER, fp ) != NULL )
         {
             sscanf( fileString, "%d %d", &taskNo, &burstTime );
-            insertLast( ll, taskNo, burstTime );
+            insertLast( ll, taskNo, burstTime, 0, 0, 0 );
         }
         fclose( fp );
     }

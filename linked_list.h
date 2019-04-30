@@ -42,7 +42,7 @@ LinkedList;
 
 /* Method declarations */
 LinkedList* makeList( int );
-void insertLast( LinkedList*, int, int );
+void insertLast( LinkedList*, int, int, int, int, int );
 void printList( LinkedList* );
 void freeList( LinkedList* );
 void removeLast( LinkedList* );
