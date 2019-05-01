@@ -5,14 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-typedef struct
-{
-    int hour;
-    int minute;
-    int second;
-}
-Time;
+#include "my_time.h"
 
 typedef struct
 {

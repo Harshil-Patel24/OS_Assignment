@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -ansi -pedantic -pthread
 OBJ_TASK_FILE = task_file_randomiser.o
-OBJ = file_io.o linked_list.o scheduler.o
+OBJ = file_io.o linked_list.o scheduler.o my_time.o
 EXEC_TASK_FILE = task_file_randomiser
 EXEC = scheduler
 EXEC_ALL = $(EXEC_TASK_FILE) $(EXEC)
@@ -26,6 +26,9 @@ linked_list.o: linked_list.c linked_list.h
 
 scheduler.o: scheduler.c scheduler.h file_io.h linked_list.h
 	$(CC) -c scheduler.c $(CFLAGS)
+
+my_time.o: my_time.c my_time.h
+	$(CC) -c my_time.c $(CFLAGS)
 
 clean:
 	rm -f $(OBJ) $(OBJ_TASK_FILE) $(EXEC) $(EXEC_TASK_FILE) task_file

@@ -5,8 +5,9 @@
 #include <unistd.h>
 #include <time.h>
 #include <pthread.h>
-#include "file_io.h"
+#include "my_time.h"
 #include "linked_list.h"
+#include "file_io.h"
 
 void schedule( char* );
 void* cpu( void* );
