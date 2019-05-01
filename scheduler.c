@@ -37,9 +37,17 @@ int main( int argc, char** argv )
             readyQ = makeList( maxSize );
             fileName = argv[1];
             simulationLog = fopen( "simulation_log", "a" );
-            schedule( fileName );
 
-            fclose( simulationLog );
+            if( simulationLog != NULL )
+            {
+                schedule( fileName );
+                fclose( simulationLog );
+            }
+            else
+            {
+                perror( "Error: Could not open file: simulation_log to append\n" );
+            }
+
         }
         else
         {
@@ -61,44 +69,31 @@ void schedule( char* taskFileName )
     /* CPU names for differenciating which thread does which task */
     char* cpuNums[3] = {"CPU-1","CPU-2","CPU-3"};
 
-    /* THIS WILL PROBABLY HAVE TO CHANGE
-     * MAKE THIS OPEN AND APPEND INSTEAD */
-    FILE* logFile = fopen( "simulation_log", "w" );
-
     /* Thread declarations */
     pthread_t cpuThread[3];
     pthread_t taskThread;
 
-    if( logFile != NULL )
+    /* Fill up all the tasks from the file to a linked list */
+    numLines = getNumLines( taskFileName );
+    tasks = makeList( numLines );
+
+    fileToLL( tasks, taskFileName );
+
+    /* Start threads */
+    pthread_create( &taskThread, NULL, task, NULL );
+
+    for( ii = 0; ii < 3; ii++ )
     {
-        /* Fill up all the tasks from the file to a linked list */
-        numLines = getNumLines( taskFileName );
-        tasks = makeList( numLines );
-
-        fileToLL( tasks, taskFileName );
-
-        /* Start threads */
-        pthread_create( &taskThread, NULL, task, NULL );
-
-        for( ii = 0; ii < 3; ii++ )
-        {
-            pthread_create( &cpuThread[ii], NULL, cpu, cpuNums[ii] );
-        }
-
-        /* Join threads */
-        pthread_join( taskThread, NULL );
-
-        for( ii = 0; ii < 3; ii++ )
-        {
-            pthread_join( cpuThread[ii], NULL );
-        }
-
-    }
-    else
-    {
-        perror( "Error: Couldn't open logfile to write\n" );
+        pthread_create( &cpuThread[ii], NULL, cpu, cpuNums[ii] );
     }
 
+    /* Join threads */
+    pthread_join( taskThread, NULL );
+
+    for( ii = 0; ii < 3; ii++ )
+    {
+        pthread_join( cpuThread[ii], NULL );
+    }
 }
 
 /* Simulates a CPU completing a task */
@@ -119,53 +114,59 @@ void* cpu( void* inCPUNum )
 
     while( !isEmpty( readyQ ) || !isEmpty( tasks ) )
     {
- printf("CPU unlocked\n");
-/*        while( )
-        pthread_cond_wait( &condition, &lock );
-*/
-        pthread_mutex_lock( &cpuLock );
-        pthread_mutex_lock( &logLock );
-        /* Take info from head of tasks linked list (ie. first task in queue) */
-        taskID = readyQ->head->task.taskID;
-        burstTime = readyQ->head->task.burstTime;
-        hr = readyQ->head->task.arrivalTime.hour;
-        min = readyQ->head->task.arrivalTime.minute;
-        sec = readyQ->head->task.arrivalTime.second;
 
-        /* This represents current time, ie. service time */
-        time( &timer );
-        serviceTimeInfo = localtime( &timer );
 
-        /* Converts to string for ease of use */
-        strftime( servTime, 50, "%H:%M:%S", serviceTimeInfo );
+        if( !isEmpty( readyQ ) )
+        {
+            pthread_mutex_lock( &cpuLock );
 
-        /* Sleeps for time period, simulating CPU completing task */
-        sleep( burstTime * 0.01 );
+            /* Take info from head of tasks linked list (ie. first task in queue) */
+            taskID = readyQ->head->task.taskID;
+            burstTime = readyQ->head->task.burstTime;
+            hr = readyQ->head->task.arrivalTime.hour;
+            min = readyQ->head->task.arrivalTime.minute;
+            sec = readyQ->head->task.arrivalTime.second;
 
-        /* Write to log */
-        sprintf( logStr, "================================\nStatistics for %s:\nTask: %d\nArrivalTime: %02d:%02d:%02d\nService Time: %s\n", cpuNum, taskID, hr, min, sec, servTime );
-        writeLog( simulationLog, logStr );
+            /* This represents current time, ie. service time */
+            time( &timer );
+            serviceTimeInfo = localtime( &timer );
 
-        /* Calculate the wait time and turn around time */
-        serviceTime.hour = serviceTimeInfo->tm_hour;
-        serviceTime.minute = serviceTimeInfo->tm_min;
-        serviceTime.second = serviceTimeInfo->tm_sec;
+            /* Converts to string for ease of use */
+            strftime( servTime, 50, "%H:%M:%S", serviceTimeInfo );
 
-        arriveTimeInt = timeToSec( readyQ->head->task.arrivalTime );
-        serviceTimeInt = timeToSec( serviceTime );
+            /* Sleeps for time period, simulating CPU completing task */
+            sleep( burstTime * 0.01 );
 
-        waitTime = serviceTimeInt - arriveTimeInt;
-        turnAroundTime = waitTime + burstTime;
+            pthread_mutex_lock( &logLock );
+            /* Write to log */
+            sprintf( logStr, "================================\nStatistics for %s:\nTask: %d\nArrivalTime: %02d:%02d:%02d\nService Time: %s\n", cpuNum, taskID, hr, min, sec, servTime );
+            writeLog( simulationLog, logStr );
+            pthread_mutex_unlock( &logLock );
 
-        totalWaitingTime += waitTime;
-        totalTurnAroundTime += turnAroundTime;
+            /* Calculate the wait time and turn around time */
+            serviceTime.hour = serviceTimeInfo->tm_hour;
+            serviceTime.minute = serviceTimeInfo->tm_min;
+            serviceTime.second = serviceTimeInfo->tm_sec;
 
-        /* Once task is finished, remove it from queue */
-        removeFirst( readyQ );
-        numTasks--;
+            arriveTimeInt = timeToSec( readyQ->head->task.arrivalTime );
+            serviceTimeInt = timeToSec( serviceTime );
 
-        pthread_mutex_unlock( &logLock );
-        pthread_mutex_unlock( &cpuLock );
+            waitTime = serviceTimeInt - arriveTimeInt;
+            turnAroundTime = waitTime + burstTime;
+
+            totalWaitingTime += waitTime;
+            totalTurnAroundTime += turnAroundTime;
+
+            /* Once task is finished, remove it from queue */
+            removeFirst( readyQ );
+            numTasks--;
+pthread_mutex_unlock( &cpuLock );
+        }
+        else
+        {
+            pthread_cond_wait( &condition, &qLock );
+        }
+
 /*        pthread_cond_signal( &condition );
 */
     }
@@ -178,7 +179,6 @@ void* cpu( void* inCPUNum )
 void* task( void* nothing )
 {
     /* Variable declarations */
-    int ii;
     char logStr[50];
 
     /* Time related variables */
@@ -192,45 +192,41 @@ void* task( void* nothing )
     {
 /* printf( "Tasks unlocked\n" );
 */
-        pthread_mutex_lock( &cpuLock );
-        pthread_mutex_lock( &logLock );
-        if( readyQ->size <= readyQ->max - 2 )
+        if( !isFull( readyQ ) )
         {
-/* printf("size < max - 2\n");
-*/
-            for( ii = 0; ii < 2; ii++ )
+            if( !isEmpty( tasks ) )
             {
-                if( !isFull( readyQ ) )
-                {
-                    if( !isEmpty( tasks ) )
-                    {
-                        time( &timer );
-                        tmInfo = localtime( &timer );
+                time( &timer );
+                tmInfo = localtime( &timer );
 
-                        hr = tmInfo->tm_hour;
-                        min = tmInfo->tm_min;
-                        sec = tmInfo->tm_sec;
+                hr = tmInfo->tm_hour;
+                min = tmInfo->tm_min;
+                sec = tmInfo->tm_sec;
 
-                        taskID = tasks->head->task.taskID;
-                        burstTime = tasks->head->task.burstTime;
+                taskID = tasks->head->task.taskID;
+                burstTime = tasks->head->task.burstTime;
 
-                        insertLast( readyQ, taskID, burstTime, hr, min, sec );
+                insertLast( readyQ, taskID, burstTime, hr, min, sec );
 
-                        strftime( currTime, 50, "%H:%M:%S", tmInfo );
+                strftime( currTime, 50, "%H:%M:%S", tmInfo );
 
-                        sprintf( logStr, "================================\n%d: %d\nArrival Time: %s\n", taskID, burstTime, currTime );
-                        numTasks++;
-                        writeLog( simulationLog, logStr );
-                        removeFirst( tasks );
+                pthread_mutex_lock( &logLock );
+                sprintf( logStr, "================================\n%d: %d\nArrival Time: %s\n", taskID, burstTime, currTime );
+                writeLog( simulationLog, logStr );
+                pthread_mutex_unlock( &logLock );
+
+                numTasks++;
+                removeFirst( tasks );
 /* printf("Task numTasks: %d\n", numTasks );
 */
-                    }
-                }
             }
+        }
+        else
+        {
+            pthread_cond_signal( &condition );
             /* pthread_cond_signal( &condition ); */
         }
         pthread_mutex_unlock( &logLock );
-        pthread_mutex_unlock( &cpuLock );
     }
     return NULL;
 }
