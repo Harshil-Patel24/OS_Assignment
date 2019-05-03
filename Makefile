@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -ansi -pedantic -pthread
+CFLAGS = -Wall -ansi -pedantic -pthread -g
 OBJ_TASK_FILE = task_file_randomiser.o
 OBJ = file_io.o linked_list.o scheduler.o my_time.o
 EXEC_TASK_FILE = task_file_randomiser
@@ -31,4 +31,4 @@ my_time.o: my_time.c my_time.h
 	$(CC) -c my_time.c $(CFLAGS)
 
 clean:
-	rm -f $(OBJ) $(OBJ_TASK_FILE) $(EXEC) $(EXEC_TASK_FILE) task_file
+	rm -f $(OBJ) $(OBJ_TASK_FILE) $(EXEC) $(EXEC_TASK_FILE) task_file simulation_log

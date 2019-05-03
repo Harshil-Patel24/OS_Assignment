@@ -198,6 +198,29 @@ void removeFirst( LinkedList* list )
     /* Free the first node */
     free( first );
     first = NULL;
+
+
+/*
+    LinkedListNode* tempNode;
+
+    if( list->head == NULL )
+    {
+    }
+    else if( list->head->next == NULL )
+    {
+        free( list->head );
+        list->head = NULL;
+        list->tail = NULL;
+    }
+    else
+    {
+        tempNode = list->head->next;
+        free( list->head );
+        list->head = NULL;
+        list->head = tempNode;
+        list->head->prev = NULL;
+    }
+*/
 }
 
 /* Will return 1 if full, 0 if not full */
@@ -221,6 +244,13 @@ int isEmpty( LinkedList* ll )
     {
         empty = 0;
     }
+/*
+    int empty = 1;
 
+    if( ll->head != NULL )
+    {
+        empty = 0;
+    }
+*/
     return empty;
 }
