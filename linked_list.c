@@ -114,32 +114,24 @@ void printList( LinkedList* list )
  **/
 void freeList( LinkedList* list )
 {
-    /* Initialise variables */
-    LinkedListNode* curr = NULL;
-    LinkedListNode* temp = NULL;
+    LinkedListNode* curr;
+    LinkedListNode* temp;
 
     /* Loops though to free all nodes in the list starting from the tail
      * and moving backwards */
-    if( list != NULL )
+    curr = list->tail;
+    while( curr != NULL )
     {
-        curr = list->tail;
-        while( curr != NULL )
-        {
-            temp = curr;
-            curr = curr->prev;
+        temp = curr;
+        curr = curr->prev;
 
-            /* Free's the node */
-            free( temp );
-            temp = NULL;
-        }
-        /* Finally free's the entire list */
-        free( list );
-        list = NULL;
+        /* Free's the node */
+        free( temp );
+        temp = NULL;
     }
-    else
-    {
-        printf( "List does not exist\n" );
-    }
+    /* Finally free's the entire list */
+    free( list );
+    list = NULL;
 }
 
 /**
@@ -199,7 +191,6 @@ void removeFirst( LinkedList* list )
     free( first );
     first = NULL;
 
-
 /*
     LinkedListNode* tempNode;
 
@@ -238,19 +229,20 @@ int isFull( LinkedList* ll )
 
 int isEmpty( LinkedList* ll )
 {
+/*
     int empty = 1;
 
     if( ll->size > 0 )
     {
         empty = 0;
     }
-/*
+*/
     int empty = 1;
 
     if( ll->head != NULL )
     {
         empty = 0;
     }
-*/
+
     return empty;
 }
